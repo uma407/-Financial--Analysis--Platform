@@ -21,6 +21,17 @@ def load_financials(csv_path: str) -> pd.DataFrame:
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"Financial data not found at {csv_path}")
     df = pd.read_csv(csv_path)
+    
+    # Validate required columns
+    required_cols = ["period"]
+    missing_cols = [col for col in required_cols if col not in df.columns]
+    if missing_cols:
+        available_cols = ", ".join(df.columns.tolist())
+        raise ValueError(
+            f"Missing required columns: {', '.join(missing_cols)}\n"
+            f"Available columns in CSV: {available_cols}\n"
+            f"Expected columns: period, revenue, net_income, total_assets, total_liabilities, operating_cash_flow"
+        )
     return df
 
 
@@ -34,6 +45,11 @@ def compute_period_deltas(
     Expects period column parseable as datetime.
     """
     df = df.copy()
+    if date_col not in df.columns:
+        raise KeyError(
+            f"Column '{date_col}' not found in dataframe.\n"
+            f"Available columns: {', '.join(df.columns.tolist())}"
+        )
     df[date_col] = pd.to_datetime(df[date_col])
     df = df.sort_values(date_col)
 
@@ -51,7 +67,11 @@ def compute_kpis(df: pd.DataFrame) -> Dict[str, float]:
     Compute simple KPIs from financial statements.
     Expected columns: revenue, net_income, total_assets, total_liabilities, operating_cash_flow.
     """
-    latest = df.sort_values("period").iloc[-1]
+    if "period" not in df.columns:
+        # If no period column, just use the last row
+        latest = df.iloc[-1]
+    else:
+        latest = df.sort_values("period").iloc[-1]
     kpis: Dict[str, float] = {}
 
     revenue = latest.get("revenue")

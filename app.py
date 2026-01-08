@@ -54,13 +54,23 @@ def page_mda():
 
     if st.button("Generate MD&A Draft"):
         with st.spinner("Generating draft..."):
-            csv_path = load_uploaded_csv(uploaded, sample_path) or sample_path
-            if not os.path.exists(csv_path):
-                st.error("CSV not found. Upload a file or place sample at data/financial_statements.csv")
-                return
-            generator = MDAGenerator()
-            draft = generator.generate_mda(csv_path)
-            st.markdown(draft)
+            try:
+                csv_path = load_uploaded_csv(uploaded, sample_path) or sample_path
+                if not os.path.exists(csv_path):
+                    st.error("CSV not found. Upload a file or place sample at data/financial_statements.csv")
+                    return
+                generator = MDAGenerator()
+                draft = generator.generate_mda(csv_path)
+                st.markdown(draft)
+            except (KeyError, ValueError) as e:
+                st.error(f"❌ **Data Format Error:**\n\n{str(e)}\n\n"
+                        f"**Please ensure your CSV has the required columns:**\n"
+                        f"- `period` (date column)\n"
+                        f"- `revenue`, `net_income`, `total_assets`, `total_liabilities`, `operating_cash_flow`")
+                st.info("💡 **Tip:** Use the sample data file format. Check the README for details.")
+            except Exception as e:
+                st.error(f"❌ **Error:** {str(e)}")
+                st.exception(e)
 
 
 def page_portfolio():

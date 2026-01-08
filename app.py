@@ -62,6 +62,14 @@ def page_mda():
                 generator = MDAGenerator()
                 draft = generator.generate_mda(csv_path)
                 st.markdown(draft)
+                
+                # Download button
+                st.download_button(
+                    label="📥 Download MD&A Draft as Markdown",
+                    data=draft,
+                    file_name="MD&A_Draft.md",
+                    mime="text/markdown"
+                )
             except (KeyError, ValueError) as e:
                 st.error(f"❌ **Data Format Error:**\n\n{str(e)}\n\n"
                         f"**Please ensure your CSV has the required columns:**\n"

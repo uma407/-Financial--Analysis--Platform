@@ -1,0 +1,13 @@
+# Core dependencies (wheels for Python 3.13)
+pandas==2.2.3
+numpy==2.1.3
+
+# Web framework
+streamlit==1.39.0
+plotly==5.23.0
+
+# Utilities
+python-dotenv==1.0.1
+requests==2.32.3
+openpyxl==3.1.5
+tabulate==0.9.0
